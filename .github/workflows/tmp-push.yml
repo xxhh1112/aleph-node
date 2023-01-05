@@ -1,0 +1,28 @@
+name: tmp push for subxt codegen
+
+on:
+  push:
+    branches:
+      - temp-build-subxt-image
+jobs:
+  build-subxt-codegen:
+    name: push
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: check if runtime metadata matches
+        run: |
+          cd aleph-client/
+          docker build --tag subxt-client-integration:latest -f  docker/subxt-integration.Dockerfile .
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: public.ecr.aws
+          username: ${{ secrets.AWS_MAINNET_ACCESS_KEY_ID }}
+          password: ${{ secrets.AWS_MAINNET_SECRET_ACCESS_KEY }}
+      - name: Push
+        run: |
+          docker tag subxt-client-integration:latest public.ecr.aws/p6e8q1z1/subxt-client-integration:latest
+          docker push public.ecr.aws/p6e8q1z1/subxt-client-integration:latest
