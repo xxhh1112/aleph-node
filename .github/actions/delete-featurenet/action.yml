@@ -61,7 +61,7 @@ runs:
         repository: Cardinal-Cryptography/${{ inputs.repo-apps-name }}
         token: ${{ inputs.gh-ci-token }}
         path: "${{ inputs.repo-apps-name }}"
-        ref: main
+        ref: A0-2736
 
     - name: Checkout featurenets repo
       uses: actions/checkout@v3
@@ -125,5 +125,5 @@ runs:
           -e AWS_REGION \
           -e FEATURENETS_S3_BUCKET_NAME=${{ inputs.featurenet-keys-s3bucket-name }} \
           -e FEATURENET_NAME=${{ steps.get-argocd-featurnet-app-name.outputs.name }} \
-          ${{ inputs.ecr-public-registry }}featurenet-helper:v0.3.0 \
+          ${{ inputs.ecr-public-registry }}featurenet-helper:A0-2736 \
           delete-featurenet-data-from-s3
