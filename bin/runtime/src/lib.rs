@@ -29,6 +29,7 @@ use frame_support::{
     weights::constants::WEIGHT_REF_TIME_PER_MILLIS,
     PalletId,
 };
+use frame_support::traits::Contains;
 use frame_system::{EnsureRoot, EnsureSignedBy};
 #[cfg(feature = "try-runtime")]
 use frame_try_runtime::UpgradeCheckSelect;
@@ -699,6 +700,17 @@ parameter_types! {
     pub Schedule: pallet_contracts::Schedule<Runtime> = Default::default();
 }
 
+pub struct ContractsCallFilter;
+
+impl Contains<RuntimeCall> for ContractsCallFilter {
+    fn contains(call: &RuntimeCall) -> bool {
+        match call {
+            RuntimeCall::NominationPools(_) => true,
+            _ => false,
+        }
+    }
+}
+
 impl pallet_contracts::Config for Runtime {
     type Time = Timestamp;
     type Randomness = RandomnessCollectiveFlip;
@@ -706,7 +718,7 @@ impl pallet_contracts::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type RuntimeCall = RuntimeCall;
     // The safest default is to allow no calls at all. This is unsafe experimental feature with no support in ink!
-    type CallFilter = Nothing;
+    type CallFilter =  ContractsCallFilter;
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
     type ChainExtension = ();
@@ -718,7 +730,7 @@ impl pallet_contracts::Config for Runtime {
     type AddressGenerator = pallet_contracts::DefaultAddressGenerator;
     type MaxCodeLen = ConstU32<{ 128 * 1024 }>;
     type MaxStorageKeyLen = ConstU32<128>;
-    type UnsafeUnstableInterface = ConstBool<false>;
+    type UnsafeUnstableInterface = ConstBool<true>;
     type MaxDebugBufferLen = ConstU32<{ 2 * 1024 * 1024 }>;
 }
 
