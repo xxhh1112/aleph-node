@@ -17,7 +17,7 @@ on:
     inputs:
       expiration:
         description: 'Time after which featurenet will be removed'
-        required: false
+        required: true
         type: choice
         options:
           - 48h
@@ -26,6 +26,16 @@ on:
           - 3h
           - 96h
           - never
+        default: 48h
+      replicas:
+        description: 'Number of replicas to start, from 0 to 50'
+        required: true
+        default: '5'
+      internal:
+        description: 'Internal network, accessible from VPN only'
+        required: false
+        type: boolean
+        default: false
       featurenet-name:
         description: 'Name of featurenet'
         type: string
@@ -149,7 +159,8 @@ jobs:
           featurenet-keys-s3bucket-name: ${{ secrets.FEATURENET_KEYS_S3BUCKET_NAME }}
           expiration: ${{ inputs.expiration == '' && '48h' || inputs.expiration }}
           featurenet-name: ${{ needs.get-final-names.outputs.final-featurenet-name }}
-          internal: "${{ inputs.internal }}"
+          replicas: ${{ inputs.replicas }}
+          internal: ${{ inputs.internal && 'true' || 'false' }}
           git-commit-author: ${{ secrets.AUTOCOMMIT_AUTHOR }}
           git-commit-email: ${{ secrets.AUTOCOMMIT_EMAIL }}
           wait-for-finalized-heads: "true"
